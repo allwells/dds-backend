@@ -1,0 +1,23 @@
+{
+  "name": "dds-backend",
+  "version": "0.0.1",
+  "description": "Drug Distribution System - Backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/allwells/dds-backend.git"
+  },
+  "author": "Allwell Onen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/allwells/dds-backend/issues"
+  },
+  "homepage": "https://github.com/allwells/dds-backend#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1"
+  }
+}
