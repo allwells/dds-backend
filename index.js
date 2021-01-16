@@ -1,7 +1,9 @@
 const express = require("express");
 const app = express();
+const morgan = require("morgan");
 
 app.use(express.json());
+morgan(":method :url :status :res[content-length] - :response-time ms :body");
 
 let drugs = [
   {
@@ -39,7 +41,7 @@ let drugs = [
   },
 ];
 
-distributions = [
+let distributions = [
   {
     id: 1,
     serial_number: "1234567890",
@@ -203,6 +205,22 @@ app.post("/api/distributions", (request, response) => {
 
   response.json(distributions);
 });
+
+const requestLogger = (request, response, next) => {
+  console.log("Method:", request.method);
+  console.log("Path:", request.path);
+  console.log("Body:", request.body);
+  console.log("---");
+
+  next();
+};
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: "Unknown endpoint" });
+};
+
+app.use(requestLogger);
+app.use(unknownEndpoint);
 
 const PORT = 3001;
 app.listen(PORT);

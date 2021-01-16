@@ -1,6 +1,22 @@
-const idGen = () => {
-  const max_id =
-    drugs.length > 0 ? Math.max(...drugs.map((drug) => drug.serial_number)) : 0;
+const mongoose = require("mongoose");
 
-  return max_id + 1;
-};
+const drugSchema = mongoose.Schema({
+  serial: String,
+  drug_name: String,
+  manufacture_date: Date,
+  expiry_date: Date,
+  nafdac_no: String,
+  net_weight: Number,
+  type: String,
+  producer: String,
+});
+
+drugSchema.set("toJSON", {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString();
+    delete returnedObject._id;
+    delete returnedObject.__v;
+  },
+});
+
+module.exports = mongoose.model("Drug", drugSchema);
