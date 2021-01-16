@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
 
+app.use(express.json());
+
 let drugs = [
   {
     serial_number: 1,
@@ -98,6 +100,13 @@ app.delete("/api/drugs/:serial_number", (request, response) => {
   drugs = drugs.filter((drug) => drug.serial_number !== serialNumber);
 
   response.status(204).end();
+});
+
+app.post("/api/drugs", (request, response) => {
+  const drug = request.body;
+  console.log(drug);
+
+  response.json(drug);
 });
 
 const PORT = 3001;
