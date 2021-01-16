@@ -37,54 +37,40 @@ let drugs = [
     type: "Local",
     producer: "Drug Company",
   },
+];
+
+distributions = [
   {
-    id: 4,
+    id: 1,
     serial_number: "1234567890",
-    drug_name: "Panadol",
-    manufacture_date: "2019-05-30",
-    expiry_date: "2020-06-29",
-    nafdac_no: "NAF-2498294984",
-    net_weight: "45.2g",
-    type: "Local",
-    producer: "Drug Company",
+    source: "London",
+    destination: "Lagos",
+    movement_date: "2021-01-16",
+    arrival_date: "2021-03-22",
+    custodian: "Drug Company",
   },
   {
-    id: 5,
+    id: 2,
     serial_number: "1234567890",
-    drug_name: "Panadol",
-    manufacture_date: "2019-05-30",
-    expiry_date: "2020-06-29",
-    nafdac_no: "NAF-2498294984",
-    net_weight: "45.2g",
-    type: "Local",
-    producer: "Drug Company",
+    source: "Lagos",
+    destination: "Abuja",
+    movement_date: "2021-01-16",
+    arrival_date: "2021-03-22",
+    custodian: "Drug Company",
   },
   {
-    id: 6,
+    id: 3,
     serial_number: "1234567890",
-    drug_name: "Panadol",
-    manufacture_date: "2019-05-30",
-    expiry_date: "2020-06-29",
-    nafdac_no: "NAF-2498294984",
-    net_weight: "45.2g",
-    type: "Local",
-    producer: "Drug Company",
-  },
-  {
-    id: 7,
-    serial_number: "1234567890",
-    drug_name: "Panadol",
-    manufacture_date: "2019-05-30",
-    expiry_date: "2020-06-29",
-    nafdac_no: "NAF-2498294984",
-    net_weight: "45.2g",
-    type: "Local",
-    producer: "Drug Company",
+    source: "Abuja",
+    destination: "Port Harcourt",
+    movement_date: "2021-01-16",
+    arrival_date: "2021-03-22",
+    custodian: "Drug Company",
   },
 ];
 
 app.get("/", (request, response) => {
-  response.send("<h3>Hello World</h3>");
+  response.send("<h3>Drug Distribution System in Nigeria</h3>");
 });
 
 // ##################################################################################### //
@@ -122,14 +108,24 @@ const genId = () => {
 app.post("/api/drugs", (request, response) => {
   const body = request.body;
 
+  const exists = drugs.find(
+    (drug) => drug.serial_number === body.serial_number
+  );
+
   if (!body.serial_number) {
     return response.status(400).json({
       error: "Serial number missing!",
     });
   }
 
+  if (exists) {
+    return response.status(409).json({
+      error: "Serial number already exits!",
+    });
+  }
+
   const drug = {
-    id: idGen,
+    id: genId(),
     serial_number: body.serial_number,
     drug_name: body.drug_name,
     manufacture_date: body.manufacture_date,
@@ -148,6 +144,65 @@ app.post("/api/drugs", (request, response) => {
 // ##################################################################################### //
 // #########################          DISTRIBUTION           ########################### //
 // ##################################################################################### //
+app.get("/api/distributions", (request, response) => {
+  response.send(distributions);
+});
+
+app.get("/api/distributions/:id", (request, response) => {
+  const id = Number(request.params.id);
+  const distribution = distributions.find(
+    (distribution) => distribution.id === id
+  );
+
+  if (distribution) {
+    response.json(distribution);
+  } else {
+    response.status(404).end();
+  }
+});
+
+app.delete("/api/distributions/:id", (request, response) => {
+  const id = Number(request.params.id);
+
+  const distribution = distributions.filter(
+    (distribution) => distributions.id !== id
+  );
+
+  response.status(204).end();
+});
+
+const distIdGen = () => {
+  max_id =
+    distributions.length > 0
+      ? Math.max(...distributions.map((dist) => dist.id))
+      : 0;
+
+  return max_id + 1;
+};
+
+app.post("/api/distributions", (request, response) => {
+  const body = request.body;
+
+  if (!body.serial_number) {
+    return response.status(400).json({
+      error: "Serial number missing!",
+    });
+  }
+
+  const distribution = {
+    id: distIdGen(),
+    serial_number: body.serial_number,
+    source: body.source,
+    destination: body.destination,
+    movement_date: body.movement_date,
+    arrival_date: body.arrival_date,
+    custodian: body.custodian,
+  };
+
+  distributions = distributions.concat(distribution);
+
+  response.json(distributions);
+});
 
 const PORT = 3001;
 app.listen(PORT);
