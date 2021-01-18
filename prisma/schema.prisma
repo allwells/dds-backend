@@ -33,11 +33,9 @@ model drug_table {
 }
 
 model user_table {
-  user_id      Int    @default(autoincrement())
+  user_id      Int    @id @default(autoincrement())
   full_name    String
   company_name String
-  email        String
+  email        String @unique
   password     String
-
-  @@id([user_id, email])
 }
