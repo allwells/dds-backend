@@ -1,5 +1,6 @@
 const DistributionRouter = require("express").Router();
 const { PrismaClient } = require("@prisma/client");
+const { exists } = require("fs");
 
 const prisma = new PrismaClient();
 

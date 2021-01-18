@@ -1,5 +1,6 @@
 const DrugRouter = require("express").Router();
 const { PrismaClient } = require("@prisma/client");
+const { exec } = require("child_process");
 const prisma = new PrismaClient();
 
 DrugRouter.get("/", async (request, response) => {
@@ -66,9 +67,18 @@ DrugRouter.put("/:serial_number", async (request, response, next) => {
 
 DrugRouter.post("/", async (request, response, next) => {
   const body = request.body;
+  const serial_number = request.params.serial_number;
+
+  const exists = await prisma.drug_table.findMany({
+    where: { serial_number: serial_number },
+  });
 
   if (body.serial == undefined || body.drug_name == undefined) {
     return response.status(400).json({ error: "Content missing" });
+  }
+
+  if (exists) {
+    return response.status(401).json({ error: "Already exists" });
   }
 
   const drug = {

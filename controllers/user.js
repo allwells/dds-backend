@@ -63,11 +63,20 @@ UserRouter.put("/:email", async (request, response, next) => {
 
 UserRouter.post("/", async (rerquest, response, next) => {
   const body = request.body;
+  const email = request.params.email;
+
+  const exists = await prisma.drug_table.findMany({
+    where: { email: email },
+  });
 
   if (body.email == undefined || body.company_name == undefined) {
     return response.status(400).json({
       error: "Content missing",
     });
+  }
+
+  if (body.email != undefined && exists) {
+    return response.status(401).json({ error: "User already exists" });
   }
 
   const user = {
