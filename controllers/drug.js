@@ -78,7 +78,7 @@ DrugRouter.post("/", async (request, response, next) => {
   }
 
   if (exists) {
-    return response.status(401).json({ error: "Already exists" });
+    return response.status(401).json({ error: "Drug already exists" });
   }
 
   const drug = {
