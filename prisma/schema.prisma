@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model distribution_table {
+  id            Int        @id @default(autoincrement())
+  serial_number String
+  source        String?
+  destination   String?
+  start_date    DateTime?
+  stop_date     DateTime?
+  custodian     String?
+  drug_table    drug_table @relation(fields: [serial_number], references: [serial_number])
+
+  @@index([serial_number], name: "serial_number")
+}
+
+model drug_table {
+  serial_number      String               @id
+  drug_name          String
+  manufacture_date   DateTime
+  expiry_date        DateTime
+  nafdac_reg_no      String
+  net_weight         Float
+  type               String
+  producer           String
+  distribution_table distribution_table[]
+}
+
+model user_table {
+  user_id      Int    @default(autoincrement())
+  full_name    String
+  company_name String
+  email        String
+  password     String
+
+  @@id([user_id, email])
+}
