@@ -1,119 +1,177 @@
 const DrugRouter = require("express").Router();
 const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const Drug = require("../models/drug");
 
-DrugRouter.get("/", async (request, response) => {
-  const drugs = await prisma.drug_table.findMany();
-
-  response.json(drugs);
+DrugRouter.get("/", async (req, res) => {
+  const drug = await Drug.find({});
+  res.json(drug);
 });
 
-DrugRouter.get("/:serial_number", async (request, response, next) => {
-  const serial_number = request.params.serial_number;
+DrugRouter.get("/:serial_number", async (req, res, next) => {
+  const serial = req.params.serial_number;
+  const drug = await Drug.findById(serial);
 
-  await prisma.drug_table
-    .findUnique({
-      where: { serial_number: serial_number },
-    })
-    .then((drug) => {
-      if (drug) {
-        response.json(drug);
+  drug
+    .then((drugs) => {
+      if (drugs) {
+        res.json(drugs);
       } else {
-        response.status(404).end();
+        res.status(404).end();
       }
     })
-    .catch((error) => next(error));
+    .catch((err) => next(err));
 });
 
-DrugRouter.delete("/:serial_number", async (request, response, next) => {
-  const serial_number = request.params.serial_number;
+DrugRouter.post("/", (req, res, next) => {
+  const body = req.body;
 
-  await prisma.drug_table
-    .delete({
-      where: { serial_number: serial_number },
-    })
-    .then((drug) => {
-      response.json(drug);
-    })
-    .catch((error) => next(error));
-});
+  if (
+    body.serial_number == undefined ||
+    body.source == undefined ||
+    body.destination == undefined ||
+    body.batch == undefined ||
+    body.low_range == undefined ||
+    body.high_range == undefined ||
+    body.start_date == undefined ||
+    body.stop_date == undefined ||
+    body.custodian == undefined
+  ) {
+    return res.status(400).json({ error: "Content missing" });
+  }
 
-DrugRouter.put("/:serial_number", async (request, response, next) => {
-  const {
-    serial_number,
-    drug_name,
-    manufacture_date,
-    expiry_date,
-    nafdac_no,
-    net_weight,
-    type,
-    producer,
-  } = request;
-
-  const drug = {
-    serial_number,
-    drug_name,
-    manufacture_date,
-    expiry_date,
-    nafdac_no,
-    net_weight,
-    type,
-    producer,
-  };
-
-  await prisma.drug_table
-    .update({
-      where: { serial_number: serial_number },
-      data: drug,
-    })
-    .then((drugs) => {
-      response.json(drugs.toJSON());
-    })
-    .catch((error) => next(error));
-});
-
-DrugRouter.post("/", async (request, response, next) => {
-  const {
-    serial_number,
-    drug_name,
-    manufacture_date,
-    expiry_date,
-    nafdac_no,
-    net_weight,
-    type,
-    producer,
-  } = request;
-
-
-  const exists = await prisma.drug_table.findUnique({
-    where: { serial_number: serial_number },
+  const drug = new Drug({
+    serial_number: body.serial_number,
+    source: body.source,
+    destination: body.destination,
+    batch: body.batch,
+    low_range: body.low_range,
+    high_range: body.high_range,
+    start_date: body.start_date,
+    stop_date: body.stop_date,
+    custodian: body.custodian,
   });
 
-  if (serial_number == undefined || drug_name == undefined) {
-    return response.status(400).json({ error: "Content missing" });
-  }
-
-  if (exists) {
-    return response.status(401).json({ error: "Drug already exists" });
-  }
-
-  const drug = {
-    serial_number,
-    drug_name,
-    manufacture_date,
-    expiry_date,
-    nafdac_no,
-    net_weight,
-    type,
-    producer,
-  };
-  await prisma.drug_table
-    .create({
-      data: drug,
-    })
+  drug
+    .save()
     .then((saved) => saved.toJSON())
-    .then((result) => response.status(201).json(result))
-    .catch((error) => next(error));
+    .then((result) => res.status(201).json(result))
+    .catch((err) => next(err));
 });
 
 module.exports = DrugRouter;
+
+// const prisma = new PrismaClient();
+
+// DrugRouter.get("/", async (request, response) => {
+//   const drugs = await prisma.drug_table.findMany();
+
+//   response.json(drugs);
+// });
+
+// DrugRouter.get("/:serial_number", async (request, response, next) => {
+//   const serial_number = request.params.serial_number;
+
+//   await prisma.drug_table
+//     .findUnique({
+//       where: { serial_number: serial_number },
+//     })
+//     .then((drug) => {
+//       if (drug) {
+//         response.json(drug);
+//       } else {
+//         response.status(404).end();
+//       }
+//     })
+//     .catch((error) => next(error));
+// });
+
+// DrugRouter.delete("/:serial_number", async (request, response, next) => {
+//   const serial_number = request.params.serial_number;
+
+//   await prisma.drug_table
+//     .delete({
+//       where: { serial_number: serial_number },
+//     })
+//     .then((drug) => {
+//       response.json(drug);
+//     })
+//     .catch((error) => next(error));
+// });
+
+// DrugRouter.put("/:serial_number", async (request, response, next) => {
+//   const {
+//     serial_number,
+//     drug_name,
+//     manufacture_date,
+//     expiry_date,
+//     nafdac_no,
+//     net_weight,
+//     type,
+//     producer,
+//   } = request;
+
+//   const drug = {
+//     serial_number,
+//     drug_name,
+//     manufacture_date,
+//     expiry_date,
+//     nafdac_no,
+//     net_weight,
+//     type,
+//     producer,
+//   };
+
+//   await prisma.drug_table
+//     .update({
+//       where: { serial_number: serial_number },
+//       data: drug,
+//     })
+//     .then((drugs) => {
+//       response.json(drugs.toJSON());
+//     })
+//     .catch((error) => next(error));
+// });
+
+// DrugRouter.post("/", async (request, response, next) => {
+//   const {
+//     serial_number,
+//     drug_name,
+//     manufacture_date,
+//     expiry_date,
+//     nafdac_no,
+//     net_weight,
+//     type,
+//     producer,
+//   } = request.body;
+
+//   const exists = await prisma.drug_table.findUnique({
+//     where: { serial_number: serial_number },
+//   });
+
+//   if (serial_number == undefined || drug_name == undefined) {
+//     return response.status(400).json({ error: "Content missing" });
+//   }
+
+//   if (exists) {
+//     return response.status(401).json({ error: "Drug already exists" });
+//   }
+
+//   const drug = {
+//     serial_number,
+//     drug_name,
+//     manufacture_date,
+//     expiry_date,
+//     nafdac_no,
+//     net_weight,
+//     type,
+//     producer,
+//   };
+
+//   await prisma.drug_table
+//     .create({
+//       data: drug,
+//     })
+//     .then((saved) => saved.toJSON())
+//     .then((result) => response.status(201).json(result))
+//     .catch((error) => next(error));
+// });

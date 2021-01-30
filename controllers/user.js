@@ -1,6 +1,6 @@
 const UserRouter = require("express").Router();
 const { PrismaClient } = require("@prisma/client");
-const { request } = require("http");
+
 const prisma = new PrismaClient();
 
 UserRouter.get("/", async (request, response) => {
