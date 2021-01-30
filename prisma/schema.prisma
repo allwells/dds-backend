@@ -10,6 +10,9 @@ datasource db {
 model distribution_table {
   id            Int        @id @default(autoincrement())
   serial_number String
+  batch         Int
+  low_range     Int
+  high_range    Int
   source        String?
   destination   String?
   start_date    DateTime?

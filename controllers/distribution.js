@@ -42,16 +42,28 @@ DistributionRouter.delete(
 );
 
 DistributionRouter.put("/:serial_number", async (request, response, next) => {
-  const serial_number = request.params.id;
-  const body = request.body;
+  const {
+    serial_number,
+    source,
+    destination,
+    batch,
+    low_range,
+    high_range,
+    start_date,
+    stop_date,
+    custodian,
+  } = request;
 
   const data = {
-    serial_number: body.serial_number,
-    source: body.source,
-    destination: body.destination,
-    start_date: body.start_date,
-    stop_date: body.stop_date,
-    custodian: body.custodian,
+    serial_number,
+    source,
+    destination,
+    batch,
+    low_range,
+    high_range,
+    start_date,
+    stop_date,
+    custodian,
   };
 
   await prisma.distribution_table
@@ -66,21 +78,34 @@ DistributionRouter.put("/:serial_number", async (request, response, next) => {
 });
 
 DistributionRouter.post("/", async (request, response, next) => {
-  const body = request.body;
+  const {
+    serial_number,
+    source,
+    destination,
+    batch,
+    low_range,
+    high_range,
+    start_date,
+    stop_date,
+    custodian,
+  } = request.body;
 
-  if (body.serial_number == undefined || body.custodian == undefined) {
+  if (serial_number == undefined || custodian == undefined) {
     return response.status(400).json({
       error: "Content missing",
     });
   }
 
   const distribution = {
-    serial_number: body.serial,
-    source: body.source,
-    destination: body.destination,
-    movement_date: body.movement_date,
-    arrival_date: body.arrival_date,
-    custodian: body.custodian,
+    serial_number,
+    source,
+    destination,
+    batch: Number(batch),
+    low_range: Number(low_range),
+    high_range: Number(high_range),
+    start_date: new Date(start_date),
+    stop_date: new Date(stop_date),
+    custodian,
   };
 
   await prisma.distribution_table

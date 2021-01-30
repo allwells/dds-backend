@@ -14,8 +14,12 @@ app.use(express.static("build"));
 app.use(express.json());
 app.use(middleware.requestLogger);
 
-app.use("/api/drugs", DrugRouter);
-app.use("/api/distributions", DistributionRouter);
+app.get("/", (req, res) => {
+  res.json({ msg: "Welcommme" });
+});
+
+app.use("/api/drug", DrugRouter);
+app.use("/api/distribution", DistributionRouter);
 
 app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);

@@ -1,6 +1,5 @@
 const DrugRouter = require("express").Router();
 const { PrismaClient } = require("@prisma/client");
-const { exec } = require("child_process");
 const prisma = new PrismaClient();
 
 DrugRouter.get("/", async (request, response) => {
@@ -13,12 +12,12 @@ DrugRouter.get("/:serial_number", async (request, response, next) => {
   const serial_number = request.params.serial_number;
 
   await prisma.drug_table
-    .findMany({
+    .findUnique({
       where: { serial_number: serial_number },
     })
-    .then((drugs) => {
-      if (drugs) {
-        response.json(drugs);
+    .then((drug) => {
+      if (drug) {
+        response.json(drug);
       } else {
         response.status(404).end();
       }
@@ -30,32 +29,40 @@ DrugRouter.delete("/:serial_number", async (request, response, next) => {
   const serial_number = request.params.serial_number;
 
   await prisma.drug_table
-    .deleteMany({
+    .delete({
       where: { serial_number: serial_number },
     })
-    .then((drugs) => {
-      response.json(drugs);
+    .then((drug) => {
+      response.json(drug);
     })
     .catch((error) => next(error));
 });
 
 DrugRouter.put("/:serial_number", async (request, response, next) => {
-  const serial_number = request.params.serial_number;
-  const body = request.body;
+  const {
+    serial_number,
+    drug_name,
+    manufacture_date,
+    expiry_date,
+    nafdac_no,
+    net_weight,
+    type,
+    producer,
+  } = request;
 
   const drug = {
-    serial_number: body.serial_number,
-    drug_name: body.drug_name,
-    manufacture_date: body.manufacture_date,
-    expiry_date: body.expiry_date,
-    nafdac_no: body.nafdac_no,
-    net_weight: body.net_weight,
-    type: body.type,
-    producer: body.producer,
+    serial_number,
+    drug_name,
+    manufacture_date,
+    expiry_date,
+    nafdac_no,
+    net_weight,
+    type,
+    producer,
   };
 
   await prisma.drug_table
-    .updateMany({
+    .update({
       where: { serial_number: serial_number },
       data: drug,
     })
@@ -66,14 +73,23 @@ DrugRouter.put("/:serial_number", async (request, response, next) => {
 });
 
 DrugRouter.post("/", async (request, response, next) => {
-  const body = request.body;
-  const serial_number = request.params.serial_number;
+  const {
+    serial_number,
+    drug_name,
+    manufacture_date,
+    expiry_date,
+    nafdac_no,
+    net_weight,
+    type,
+    producer,
+  } = request;
 
-  const exists = await prisma.drug_table.findMany({
+
+  const exists = await prisma.drug_table.findUnique({
     where: { serial_number: serial_number },
   });
 
-  if (body.serial == undefined || body.drug_name == undefined) {
+  if (serial_number == undefined || drug_name == undefined) {
     return response.status(400).json({ error: "Content missing" });
   }
 
@@ -82,16 +98,15 @@ DrugRouter.post("/", async (request, response, next) => {
   }
 
   const drug = {
-    serial_number: body.serial_number,
-    drug_name: body.drug_name,
-    manufacture_date: body.manufacture_date,
-    expiry_date: body.expiry_date,
-    nafdac_no: body.nafdac_no,
-    net_weight: body.net_weight,
-    type: body.type,
-    producer: body.producer,
+    serial_number,
+    drug_name,
+    manufacture_date,
+    expiry_date,
+    nafdac_no,
+    net_weight,
+    type,
+    producer,
   };
-
   await prisma.drug_table
     .create({
       data: drug,
