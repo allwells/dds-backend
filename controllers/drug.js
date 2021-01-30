@@ -27,28 +27,26 @@ DrugRouter.post("/", (req, res, next) => {
 
   if (
     body.serial_number == undefined ||
-    body.source == undefined ||
-    body.destination == undefined ||
-    body.batch == undefined ||
-    body.low_range == undefined ||
-    body.high_range == undefined ||
-    body.start_date == undefined ||
-    body.stop_date == undefined ||
-    body.custodian == undefined
+    body.drug_name == undefined ||
+    body.manufacture_date == undefined ||
+    body.expiry_date == undefined ||
+    body.nafdac_reg_no == undefined ||
+    body.net_weight == undefined ||
+    body.type == undefined ||
+    body.producer == undefined
   ) {
     return res.status(400).json({ error: "Content missing" });
   }
 
   const drug = new Drug({
     serial_number: body.serial_number,
-    source: body.source,
-    destination: body.destination,
-    batch: body.batch,
-    low_range: body.low_range,
-    high_range: body.high_range,
-    start_date: body.start_date,
-    stop_date: body.stop_date,
-    custodian: body.custodian,
+    drug_name: body.drug_name,
+    manufacture_date: body.manufacture_date,
+    expiry_date: body.expiry_date,
+    nafdac_reg_no: body.nafdac_reg_no,
+    net_weight: body.net_weight,
+    type: body.type,
+    producer: body.producer,
   });
 
   drug
