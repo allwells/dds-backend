@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const drugSchema = new mongoose.Schema({
-  serial_number: Number,
+  serial_number: String,
   drug_name: String,
   manufacture_date: Date,
   expiry_date: Date,

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const distributionSchema = new mongoose.Schema({
-  serial_number: Number,
+  serial_number: String,
   source: String,
   destination: String,
   batch: Number,

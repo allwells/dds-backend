@@ -9,9 +9,8 @@ DrugRouter.get("/", async (req, res) => {
 
 DrugRouter.get("/:serial_number", async (req, res, next) => {
   const serial = req.params.serial_number;
-  const drug = await Drug.findById(serial);
 
-  drug
+  await Drug.find({ serial_number: serial })
     .then((drugs) => {
       if (drugs) {
         res.json(drugs);
@@ -22,7 +21,7 @@ DrugRouter.get("/:serial_number", async (req, res, next) => {
     .catch((err) => next(err));
 });
 
-DrugRouter.post("/", (req, res, next) => {
+DrugRouter.post("/", async (req, res, next) => {
   const body = req.body;
 
   if (
@@ -49,7 +48,7 @@ DrugRouter.post("/", (req, res, next) => {
     producer: body.producer,
   });
 
-  drug
+  await drug
     .save()
     .then((saved) => saved.toJSON())
     .then((result) => res.status(201).json(result))

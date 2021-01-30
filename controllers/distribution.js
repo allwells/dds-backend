@@ -9,9 +9,8 @@ DistributionRouter.get("/", async (req, res) => {
 
 DistributionRouter.get("/:serial_number", async (req, res, next) => {
   const serial = req.params.serial_number;
-  const dist = await Distribution.findById(serial);
 
-  dist
+  await Distribution.find({ serial_number: serial })
     .then((dists) => {
       if (dists) {
         res.json(dists);
@@ -22,7 +21,7 @@ DistributionRouter.get("/:serial_number", async (req, res, next) => {
     .catch((err) => next(err));
 });
 
-DistributionRouter.post("/", (req, res, next) => {
+DistributionRouter.post("/", async (req, res, next) => {
   const body = req.body;
 
   if (
@@ -51,7 +50,7 @@ DistributionRouter.post("/", (req, res, next) => {
     custodian: body.custodian,
   });
 
-  distribution
+  await distribution
     .save()
     .then((saved) => saved.toJSON())
     .then((result) => res.status(201).json(result))
